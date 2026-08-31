@@ -11,12 +11,10 @@ permissions:
   id-token: write
   contents: read
 
-
 env:
   AZURE_WEBAPP_NAME: veerudemo-app
   TF_WORKING_DIR: terraform
   APP_WORKING_DIR: app
-
 
 jobs:
 
@@ -49,10 +47,17 @@ jobs:
         working-directory: app
         run: npm test --if-present
 
+      # --------------------------------------------------------
+      # Create application package
+      # IMPORTANT:
+      # node_modules is included because Terraform/App Service
+      # has SCM_DO_BUILD_DURING_DEPLOYMENT = false
+      # --------------------------------------------------------
+
       - name: Create application package
         working-directory: app
         run: |
-          zip -r ../app.zip . -x "node_modules/*"
+          zip -r ../app.zip .
 
       - name: Upload application artifact
         uses: actions/upload-artifact@v4
@@ -91,7 +96,7 @@ jobs:
 
 
       # --------------------------------------------------------
-      # Terraform
+      # Setup Terraform
       # --------------------------------------------------------
 
       - name: Setup Terraform
@@ -142,8 +147,7 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          # IMPORTANT:
-          # Always use the GitHub Managed Identity as deployer.
+          # GitHub Actions Managed Identity Object ID
           TF_VAR_deployer_principal_id: ${{ secrets.AZURE_PRINCIPAL_ID }}
 
         run: |
@@ -162,8 +166,7 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          # IMPORTANT:
-          # Always use the GitHub Managed Identity as deployer.
+          # GitHub Actions Managed Identity Object ID
           TF_VAR_deployer_principal_id: ${{ secrets.AZURE_PRINCIPAL_ID }}
 
         run: |
@@ -183,11 +186,19 @@ jobs:
 
     steps:
 
+      # --------------------------------------------------------
+      # Download application artifact
+      # --------------------------------------------------------
+
       - name: Download application artifact
         uses: actions/download-artifact@v4
         with:
           name: app-package
 
+
+      # --------------------------------------------------------
+      # Azure Login
+      # --------------------------------------------------------
 
       - name: Azure Login
         uses: azure/login@v2
@@ -196,6 +207,10 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+
+      # --------------------------------------------------------
+      # Deploy application
+      # --------------------------------------------------------
 
       - name: Deploy application to Azure App Service
         uses: azure/webapps-deploy@v3
