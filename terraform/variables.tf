@@ -4,11 +4,13 @@ variable "prefix" {
   default     = "veerudemo"
 }
 
+
 variable "location" {
   description = "Azure region"
   type        = string
   default     = "centralindia"
 }
+
 
 variable "vnet_cidr" {
   description = "VNet address space"
@@ -16,11 +18,13 @@ variable "vnet_cidr" {
   default     = "10.10.0.0/16"
 }
 
+
 variable "public_subnet_cidr" {
   description = "Public subnet address space"
   type        = string
   default     = "10.10.1.0/24"
 }
+
 
 variable "app_subnet_cidr" {
   description = "Private App subnet address space"
@@ -28,11 +32,13 @@ variable "app_subnet_cidr" {
   default     = "10.10.2.0/24"
 }
 
+
 variable "pe_subnet_cidr" {
   description = "Private Endpoint subnet address space"
   type        = string
   default     = "10.10.3.0/24"
 }
+
 
 variable "app_service_sku" {
   description = "App Service Plan SKU"
@@ -40,17 +46,30 @@ variable "app_service_sku" {
   default     = "B1"
 }
 
+
 variable "sql_sku" {
   description = "Azure SQL Database SKU"
   type        = string
   default     = "Basic"
 }
 
+
 variable "sql_admin_username" {
   description = "SQL administrator username"
   type        = string
   default     = "sqladminuser"
 }
+
+
+# ------------------------------------------------------------
+# GITHUB ACTIONS DEPLOYER IDENTITY
+# ------------------------------------------------------------
+
+variable "deployer_principal_id" {
+  description = "Object ID of the GitHub Actions User Assigned Managed Identity"
+  type        = string
+}
+
 
 variable "tags" {
   type = map(string)

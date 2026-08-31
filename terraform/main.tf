@@ -3,6 +3,7 @@
 # Connects all Terraform child modules together
 # ============================================================
 
+
 # ------------------------------------------------------------
 # 1. RESOURCE GROUP
 # ------------------------------------------------------------
@@ -115,13 +116,14 @@ module "key_vault" {
   # App Service Managed Identity
   app_service_principal_id = module.app_service.principal_id
 
-  # Identity running Terraform/GitHub Actions
-  deployer_principal_id = data.azurerm_client_config.current.object_id
+  # GitHub Actions User Assigned Managed Identity
+  # This is explicitly supplied through TF_VAR_deployer_principal_id.
+  deployer_principal_id = var.deployer_principal_id
 
-  # Store Application Insights connection string in Key Vault
+  # Application Insights connection string
   app_insights_connection_string = module.app_insights.connection_string
 
-  # Store SQL connection string in Key Vault
+  # SQL connection string
   sql_connection_string = module.sql_database.connection_string
 
   tags = var.tags
